@@ -5,14 +5,13 @@ on:
     branches:
       - main
 jobs:
-  deploy:
-    name: Deploy to Stage
+  test:
+    name: Test PR
     runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 1
       matrix:
         node-version: ['12']
-        os: [ubuntu-latest]
+        os: [macOS-latest]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -20,20 +19,14 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: npm install
-        run: npm i
-      - name: Setup CLI
-        uses: adobe/aio-cli-setup-action@1.1.0
-        with:
-          os: ${{ matrix.os }}
-          version: 7.0.0
-      - name: Build
-        env:
-          AIO_RUNTIME_NAMESPACE: ${{ secrets.AIO_RUNTIME_NAMESPACE_STAGE }}
-        uses: adobe/aio-apps-action@1.1.0
-        with:
-          os: ${{ matrix.os }}
-          command: build
+#       - name: npm install
+#         run: npm i
+#       - name: Setup CLI
+#         uses: adobe/aio-cli-setup-action@1.0.0
+#         with:
+#           os: ${{ matrix.os }}
+      - name: Check1
+        run: echo "Test Check before generating token, env var - $AIO_IMS_CONTEXTS_CLI_ACCESS__TOKEN "
       - name: Auth
         uses: adobe/aio-apps-action@auth_support
         with:
@@ -45,11 +38,10 @@ jobs:
           IMSORGID: ${{ secrets.IMSORGID_STAGE }}
           SCOPES: ${{ secrets.SCOPES_STAGE }}
           KEY: ${{ secrets.KEY_STAGE }}
-      - name: Deploy
-        env:
           AIO_RUNTIME_NAMESPACE: ${{ secrets.AIO_RUNTIME_NAMESPACE_STAGE }}
-          AIO_RUNTIME_AUTH: ${{ secrets.AIO_RUNTIME_AUTH_STAGE }}
-        uses: adobe/aio-apps-action@1.1.0
-        with:
-          os: ${{ matrix.os }}
-          command: deploy
+      - name: Check2
+        run: echo "Check after generating token, env var - $AIO_IMS_CONTEXTS_CLI_ACCESS__TOKEN "
+#         uses: adobe/aio-apps-action@1.0.0
+#         with:
+#           os: ${{ matrix.os }}
+#           command: test
